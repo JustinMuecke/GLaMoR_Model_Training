@@ -15,8 +15,8 @@ public class Main {
             OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 
             // Input and output directories
-            File inputDirectory = new File("../data/ont_modules_inconsistent");
-            File outputDirectory = new File("../data/ont_modules_inconsistent_rdf");
+            File inputDirectory = new File("../../GLaMoR/data/ont_modules_inconsistent");
+            File outputDirectory = new File("../../GLaMoR/data/ont_modules_inconsistent_rdf");
 
             // Ensure output directory exists
             if (!outputDirectory.exists()) {
@@ -46,6 +46,8 @@ public class Main {
                     manager.saveOntology(ontology, format, IRI.create(outputFile.toURI()));
 
                     System.out.println("Converted and saved: " + outputFile.getName());
+                    manager.removeOntology(ontology);
+                    manager.getIRIMappers().clear();
                 } catch (Exception e) {
                     System.err.println("Error processing file: " + inputFile.getName());
                     e.printStackTrace();
