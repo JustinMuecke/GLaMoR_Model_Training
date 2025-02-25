@@ -22,7 +22,6 @@ else:
 print(torch.__version__)
 torch.manual_seed(42)
 
-type Tensor = List[List[float]]
 
 
 def pad_tensors(train_x, eval_x, test_x, batch_size=1000) -> Tuple[List[np.ndarray], int]:
@@ -36,6 +35,27 @@ def pad_tensors(train_x, eval_x, test_x, batch_size=1000) -> Tuple[List[np.ndarr
         padded_batch = [np.pad(entry, ((0, max_length - len(entry)), (0, 0)), mode='constant') for entry in batch]
         padded.extend(padded_batch)  # Store processed batch
 
+    # Convert each NumPy array to a PyTorch tensor
+    tensor_data = [[torch.from_numpy(arr) for arr in sublist] for sublist in padded]
+
+# Stack into a single tensor (if all shapes match)
+    return tensor_data, max_length
+
+def get_tensor(train_x, eval_x, test_x):
+    import torch
+
+    x = train_x + eval_x + test_x
+    max_length = max(len(entry) for entry in x)  # Determine max sequence length
+    feature_dim = x[0].shape[1]  # Assuming each entry is (seq_len, feature_dim)
+
+    # Preallocate a contiguous 3D tensor
+    padded = torch.zeros((len(x), max_length, feature_dim), dtype=torch.float16)
+
+    # Efficiently fill the tensor
+    for i, entry in enumerate(x):
+        seq_len = len(entry)
+        padded[i, :seq_len, :] = torch.tensor(entry)  # Copy only the existing values
+    
     return padded, max_length
 
 def node():
@@ -47,24 +67,24 @@ def node():
     test_x, test_y = load_data("test")
 
     print("Concatinationg X Tensors")
-    x, max_length = pad_tensors(train_x, eval_x, test_x, 1)
+    x, max_length = get_tensor(train_x, eval_x, test_x)
 
-    print("Got Data")
-    min_len = min(map((lambda entry : len(entry)), x))
-    max_len = max(map((lambda entry : len(entry)), x))
-    print(min_len)
-    print(max_len)
- ##   (100,n)
-    return
+
     in_channelsN = max_length
     hidden_channelsN = 512#1024
     out_channelsN = 2
     dropout = 0.5
+    print(x)
+    train_mask = [1 for i in range(len(train_y))] + [0 for i in range(len(eval_y))] + [0 for i in range(len(test_y))]
+    eval_mask = [0 for i in range(len(train_y))] + [1 for i in range(len(eval_y))] + [0 for i in range(len(test_y))]
+    test_mask = [0 for i in range(len(train_y))] + [0 for i in range(len(eval_y))] + [1 for i in range(len(test_y))]
+
 
     #GNN for creating the task graph
     gnn = Prodigy.GNN(in_channels = in_channelsN ,hidden_channels=hidden_channelsN,out_channels=out_channelsN
                             ,n_layers=1,device=device,model = "GCN",dropout=dropout, out = True)
 
+    
     #Prodigy
     ## hyperparam
     ways = 5
@@ -95,7 +115,7 @@ def node():
                   maxQ=1000,
                   x=x,
                   yAll=train_y,
-                  edge_index=edgeN_index,
+                  edge_index=[],
                   prompt_mask=train_mask,
                   query_mask=train_mask,
                   prompts=prompts,
@@ -108,14 +128,14 @@ def node():
                   val_x=x,
                   val_y=eval_y,
                   val_mask=eval_mask,
-                  val_edge=edgeN_index,
+                  val_edge=[],
                   patience=float('inf'),
-                  name="Prodigy-cora_node")
+                  name="Prodigy-node")
 
     Prodigy.evaluate(model=modelP,
                      x=x,
                      y=eval_y,
-                     edge_index=edgeN_index,
+                     edge_index=[],
                      prompt_mask=train_mask,
                      query_mask=eval_mask,
                      prompts=prompts,
@@ -123,11 +143,11 @@ def node():
                      task="node")
 
     Prodigy.test(model=modelP,
-                 x=xN,
-                 y=testN_y,
-                 edge_index=edgeN_index,
-                 prompt_mask=trainN_mask,
-                 query_mask=testN_mask,
+                 x=x,
+                 y=test_y,
+                 edge_index=[],
+                 prompt_mask=train_mask,
+                 query_mask=test_mask,
                  prompts=prompts,
                  numberQ=1,
                  task="node")

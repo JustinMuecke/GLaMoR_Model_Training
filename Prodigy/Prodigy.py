@@ -438,7 +438,7 @@ def train(model, maxQ, x, yAll, edge_index, prompt_mask, query_mask, prompts, nu
             queriesAll = torch.range(0, len(yAll) - 1)[shuffle]
             queriesAll = queriesAll.split(numberQ)
 
-        yS = yAll[shuffle]
+        yS = np.array(yAll)[shuffle]
         xd = None
         if task == "graph":
             xd = [x[0].detach().clone(), x[1].detach().clone()]
