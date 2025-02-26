@@ -170,4 +170,7 @@ data/**
 # PyPI configuration file
 .pypirc
 
+
 *.pkl
+/wandb*
+*.csv

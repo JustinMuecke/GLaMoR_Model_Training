@@ -4,3 +4,6 @@
 [submodule "GraphLanguageModels"]
 	path = GraphLanguageModels
 	url = https://github.com/JustinMuecke/GraphLanguageModels.git
+[submodule "GLaMoR-HermiT"]
+	path = GLaMoR-HermiT
+	url = https://github.com/JustinMuecke/GLaMoR-HermiT.git
