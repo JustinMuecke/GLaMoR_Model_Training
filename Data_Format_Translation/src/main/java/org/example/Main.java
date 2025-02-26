@@ -15,7 +15,7 @@ public class Main {
             OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 
             // Input and output directories
-            File inputDirectory = new File("../../GLaMoR/data/ont_modules_inconsistent");
+            File inputDirectory = new File("../../GLaMoR/data./ont_modules_inconsistent");
             File outputDirectory = new File("../../GLaMoR/data/ont_modules_inconsistent_rdf");
 
             // Ensure output directory exists
