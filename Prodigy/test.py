@@ -42,21 +42,11 @@ def pad_tensors(train_x, eval_x, test_x, batch_size=1000) -> Tuple[List[np.ndarr
     return tensor_data, max_length
 
 def get_tensor(train_x, eval_x, test_x):
-    import torch
+
 
     x = train_x + eval_x + test_x
-    max_length = max(len(entry) for entry in x)  # Determine max sequence length
-    feature_dim = x[0].shape[1]  # Assuming each entry is (seq_len, feature_dim)
-
-    # Preallocate a contiguous 3D tensor
-    padded = torch.zeros((len(x), max_length, feature_dim), dtype=torch.float16)
-
-    # Efficiently fill the tensor
-    for i, entry in enumerate(x):
-        seq_len = len(entry)
-        padded[i, :seq_len, :] = torch.tensor(entry)  # Copy only the existing values
-    
-    return padded, max_length
+    tensor = torch.tensor(np.stack(x)) 
+    return tensor
 
 def node():
     print("Loading Train Data")
@@ -67,10 +57,13 @@ def node():
     test_x, test_y = load_data("test")
 
     print("Concatinationg X Tensors")
-    x, max_length = get_tensor(train_x, eval_x, test_x)
-
-
-    in_channelsN = max_length
+    x  = get_tensor(train_x, eval_x, test_x)
+    train_y = torch.tensor(train_y).to(device)
+    eval_y = torch.tensor(eval_y).to(device)
+    test_y = torch.tensor(test_y).to(device)
+    print(train_y)
+    
+    in_channelsN = 100
     hidden_channelsN = 512#1024
     out_channelsN = 2
     dropout = 0.5
@@ -115,7 +108,7 @@ def node():
                   maxQ=1000,
                   x=x,
                   yAll=train_y,
-                  edge_index=[],
+                  edge_index=torch.empty((2,0), dtype=torch.float16),
                   prompt_mask=train_mask,
                   query_mask=train_mask,
                   prompts=prompts,
@@ -128,14 +121,14 @@ def node():
                   val_x=x,
                   val_y=eval_y,
                   val_mask=eval_mask,
-                  val_edge=[],
+                  val_edge=torch.empty((2,0), dtype=torch.float16),
                   patience=float('inf'),
                   name="Prodigy-node")
 
     Prodigy.evaluate(model=modelP,
                      x=x,
                      y=eval_y,
-                     edge_index=[],
+                     edge_index=torch.empty((2,0), dtype=torch.float16),
                      prompt_mask=train_mask,
                      query_mask=eval_mask,
                      prompts=prompts,
@@ -145,7 +138,7 @@ def node():
     Prodigy.test(model=modelP,
                  x=x,
                  y=test_y,
-                 edge_index=[],
+                 edge_index=torch.empty((2,0), dtype=torch.float16),
                  prompt_mask=train_mask,
                  query_mask=test_mask,
                  prompts=prompts,

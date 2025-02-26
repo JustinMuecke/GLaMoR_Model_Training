@@ -160,7 +160,7 @@ class GNN(torch.nn.Module):
 
         Return: Return: The labels of the target nodes.
         """
-        return x
+        return x, 0
         for i in range(len(self.cons)):
             if i == 0:
                 if features is None:
@@ -438,7 +438,7 @@ def train(model, maxQ, x, yAll, edge_index, prompt_mask, query_mask, prompts, nu
             queriesAll = torch.range(0, len(yAll) - 1)[shuffle]
             queriesAll = queriesAll.split(numberQ)
 
-        yS = np.array(yAll)[shuffle]
+        yS = yAll[shuffle]
         xd = None
         if task == "graph":
             xd = [x[0].detach().clone(), x[1].detach().clone()]
@@ -1006,6 +1006,7 @@ class Prodigy(torch.nn.Module):
                     x[i][maskV] = torch.zeros(len(x[i][0])).to(self.device)
 
         # Getting the features for the data graph depending on the task
+
         self.expert.out = False
         xQ = None
         xP = None
@@ -1048,7 +1049,7 @@ class Prodigy(torch.nn.Module):
                     p = prompts[j][i]
 
                     if task == "node" or task == "graph":
-                        xd[j * (ways + 1) + i + 1] = xP[p]
+                        xd[j * (ways + 1) + i + 1, :] = xP[p]
                     elif task == "link" or task == "linkS" or task == "reason":
                         xd[j * (ways + 1) + i + 1] = self.linear(
                             torch.cat((xP[p[0]], xP[p[1]], xEMaxP), 0))  # Prodigy original
