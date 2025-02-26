@@ -744,37 +744,28 @@ def test(model, x, y, edge_index, prompt_mask, query_mask, prompts, numberQ, tas
     # Output: acc or roc auc for the test set
     if task == "node" or task == "reason":
         correct = (torch.max(pred, 1).indices.float() == y.float()).sum()
-        acc = correct / len(y)
-    elif task == "link" or task == "linkS":
-        correct = (torch.round(torch.flatten(pred[:, 1])).long() == y.float()).sum()
-        acc = correct / len(y)
-        yp = torch.flatten(y).float()
-        print(f'ROC AUC Train: {roc_auc_score(yp.cpu(), pred[:, 1].cpu().detach().numpy()):.4f}')
-    elif task == "graph":
-        if len(y[0]) > 1:
-            correctsA = torch.flatten(torch.round(pred[y != -1])).long() == torch.flatten(y[y != -1]).float()
-            correct = correctsA.sum()
-            acc = correct / (len(torch.flatten(y[y != -1])))
-        else:
-            correctsA = torch.flatten(torch.round(pred[:, 1])).long() == torch.flatten(y.float())
-            correct = correctsA.sum()
-            acc = correct / (len(torch.flatten(y)))
-        if len(y[0]) > 1:
-            minR = float(1)
-            maxR = float(0)
-            for i in range(len(y[0])):
-                roc = roc_auc_score(y[:, i][y[:, i] != -1].cpu(), pred[:, i][y[:, i] != -1].cpu().detach().numpy())
-                if roc < minR:
-                    minR = roc
-                if roc > maxR:
-                    maxR = roc
-            print(f'ROC AUC Test Max: {maxR:.4f}')
-            print(f'ROC AUC Test Min: {minR:.4f}')
-            print(f'ROC AUC Test: {roc_auc_score(y[y != -1].cpu(), pred[y != -1].cpu().detach().numpy()):.4f}')
-        else:
-            yp = torch.flatten(y).float()
-            print(f'ROC AUC Test: {roc_auc_score(yp.cpu(), pred[:, 1].cpu().detach().numpy()):.4f}')
-    print(f'Accuracy Test: {acc:.4f}')
+  
+        _, predicted = torch.max(pred, 1)
+
+        predicted = predicted.float()
+        y = y.float()
+
+        correct = (predicted == y).sum()
+        accuracy = correct / len(y)
+
+        TP = ((predicted == 1) & (y == 1)).sum()
+        FP = ((predicted == 1) & (y == 0)).sum()
+        FN = ((predicted == 0) & (y == 1)).sum()
+
+        # Precision and Recall
+        precision = TP / (TP + FP) if TP + FP > 0 else torch.tensor(0.0)
+        recall = TP / (TP + FN) if TP + FN > 0 else torch.tensor(0.0)
+
+        # Optionally print the values
+        print(f"Accuracy: {accuracy.item()}")
+        print(f"Precision: {precision.item()}")
+        print(f"Recall: {recall.item()}")
+    return accuracy.item(), precision.item(), recall.item()
 
 
 # Prodigy

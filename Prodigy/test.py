@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 from typing import List, Tuple
 from data_loading import load_data
+import itertools
 
 if torch.cuda.is_available():
     device = torch.device("cuda")
@@ -48,7 +49,7 @@ def get_tensor(train_x, eval_x, test_x):
     tensor = torch.tensor(np.stack(x)) 
     return tensor
 
-def node():
+def node(lr, ways, weight_decay, ):
     print("Loading Train Data")
     train_x, train_y = load_data("train")
     print("Loading Eval Data")
@@ -80,7 +81,7 @@ def node():
     
     #Prodigy
     ## hyperparam
-    ways = 5
+    
     num_classes = 2
     
     prompts =  Prodigy.getPrompts(train_y ,ways, num_classes)
@@ -97,8 +98,7 @@ def node():
     modelP.to(device)
     
     #Optimizer
-    lr =  0.002#0.0002
-    weight_decay=0#0.002# 0.02#0.02#0.02#0.02#0.02 
+    
     
     
     optimizer = torch.optim.Adam(modelP.parameters(), lr=lr, weight_decay=weight_decay)
@@ -135,7 +135,7 @@ def node():
                      numberQ=1,
                      task="node")
 
-    Prodigy.test(model=modelP,
+    accuracy, precision, recall = Prodigy.test(model=modelP,
                  x=x,
                  y=test_y,
                  edge_index=torch.empty((2,0), dtype=torch.float16),
@@ -144,14 +144,44 @@ def node():
                  prompts=prompts,
                  numberQ=1,
                  task="node")
-
+    return accuracy, precision, recall, modelP
 
 #[1...., 0.....]
 #[0,....1, ...0]
 #[0,..........1]
 
 def main():
-    node()
+
+    ways = [3, 5, 8, 10, 15]
+    lr =  [0.001, 0.001, 0.0005, 0.0001, 0.00005]
+    weight_decay=[0.02, 0.002, 0.001, 0.0005]
+    combinations = itertools.product(lr, ways, weight_decay)
+
+
+    best_recall = float('inf')
+    best_precision = float('inf')
+    best_accuracy = float('inf')
+    best_ways = 0
+    best_weight_decay = 0
+    best_lr = 0
+    best_model = None
+    for combination in combinations:
+        lr, ways, weight_decay = combination
+        accuracy, precision, recall, model = node(lr=lr ,ways=ways, weight_decay=weight_decay)
+        if recall < best_recall:
+            best_recall = recall
+            best_accuracy = accuracy
+            best_precision = precision
+            best_ways = ways
+            best_lr = lr 
+            best_weight_decay = weight_decay
+            best_model = model
+
+    print(f"Best Recall: {best_recall}")
+    print(f"Best Precision: {best_precision}")
+    print(f"Best Accuracy: {best_accuracy}")
+    print(f"Parameters: LR {best_lr}, Weight Decay {best_weight_decay}, Ways {best_ways}")
+
 
 if __name__ == "__main__":
     main()
