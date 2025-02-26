@@ -181,6 +181,7 @@ def main():
     print(f"Best Precision: {best_precision}")
     print(f"Best Accuracy: {best_accuracy}")
     print(f"Parameters: LR {best_lr}, Weight Decay {best_weight_decay}, Ways {best_ways}")
+    torch.save(best_model.state_dict(), "models/" + f"prodigy_ways-{best_ways}_lr-{best_lr}_wd-{best_weight_decay}")
 
 
 if __name__ == "__main__":
