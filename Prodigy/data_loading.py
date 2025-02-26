@@ -7,8 +7,8 @@ import pandas as pd
 def load_data(split : str)-> Tuple[List[np.ndarray], List[int]]:
 
     embeddings = {}
-    for file in os.listdir("data/embeddings_full"):
-        array = np.load("data/embeddings_full/"+file)
+    for file in os.listdir("../data/embeddings"):
+        array = np.load("../data/embeddings/"+file)
         embeddings[file] = array
 
     df = pd.read_csv(f"data/{split}_data.csv", header=0)

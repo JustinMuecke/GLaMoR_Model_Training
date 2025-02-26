@@ -6,7 +6,6 @@ from sklearn.linear_model import LogisticRegression
 from typing import Dict, Tuple
 from sklearn.metrics import make_scorer, accuracy_score, precision_score, recall_score
 
-
 def _perform_grid_search(parameters : Dict[str, Dict], x_train :pd.DataFrame, y_train : pd.DataFrame, scoring : str = "accuracy") -> Tuple[object, str]:    
     '''
     Given the parameters containing the ranges, performs a gridsearch
