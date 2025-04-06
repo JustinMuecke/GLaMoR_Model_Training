@@ -8,9 +8,10 @@ def load_data(split : str)-> Tuple[List[np.ndarray], List[int]]:
 
     embeddings = {}
     for file in os.listdir("../data/embeddings"):
-        if ".npy" in file:
+        if(".npy" in file):
             array = np.load("../data/embeddings/"+file)
             embeddings[file] = array
+
 
     df = pd.read_csv(f"../data/{split}_data.csv", header=0)
     df["consistency"] = df["consistency"].map({"Consistent": 0, "Inconsistent": 1})

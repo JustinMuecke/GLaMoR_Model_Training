@@ -5,7 +5,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from typing import Dict, Tuple
 from sklearn.metrics import make_scorer, accuracy_score, precision_score, recall_score
-
+import pickle
 
 def _perform_grid_search(parameters : Dict[str, Dict], x_train :pd.DataFrame, y_train : pd.DataFrame, scoring : str = "accuracy") -> Tuple[object, str]:    
     '''
@@ -55,13 +55,14 @@ def _perform_grid_search(parameters : Dict[str, Dict], x_train :pd.DataFrame, y_
 
 if __name__ == "__main__":
  
-
+    path = "../../GLaMoR/data/filtered_embeddings/"
     embeddings = {}
-    for file in os.listdir("data"):
-        array = np.load("data/"+file)
-        embeddings[file] = array
+    for file in os.listdir(path):
+        if(".npy" in file):
+            array = np.load(path+file)
+            embeddings[file] = array
 
-    dataset = pd.read_csv("filtered_dataset.csv", header = 0)
+    dataset = pd.read_csv("../../GLaMoR/data/filtered_dataset.csv", header = 0)
     x = [embeddings.get(filename.split(".")[0]+".npy", np.full((100,), np.NaN)) for filename in dataset["file_name"].values.tolist()]
     # Convert list of arrays into a DataFrame (each row corresponds to one array)
     train_data = pd.DataFrame(x, columns=[f"feature_{i}" for i in range(100)])  # Adjust number of features as needed
@@ -71,7 +72,7 @@ if __name__ == "__main__":
 
 # Filter out rows where any feature vector is NaN
     train_data = train_data.dropna(subset=[f"feature_{i}" for i in range(100)])
-    print(train_data)
+    train_data.drop(train_data.tail(int(len(train_data)*0.15)).index, inplace=True)
     parameter_grid : Dict[str, Dict] = {
                         "logistic_regression": {
                             "model": LogisticRegression(), 
@@ -83,4 +84,6 @@ if __name__ == "__main__":
                             }
                         }
                     }
-    _perform_grid_search(parameter_grid, train_data.drop("y", axis=1), train_data["y"])
+    model, _ = _perform_grid_search(parameter_grid, train_data.drop("y", axis=1), train_data["y"])
+    with open("regression.pkl", "wb") as file:
+        pickle.dump(model, file)

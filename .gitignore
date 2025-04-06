@@ -169,4 +169,8 @@ data/**
 
 # PyPI configuration file
 .pypirc
-/wandb/*
+
+
+*.pkl
+/wandb*
+*.csv
