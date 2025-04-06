@@ -160,7 +160,7 @@ class GNN(torch.nn.Module):
 
         Return: Return: The labels of the target nodes.
         """
-        return x
+        return x, 0
         for i in range(len(self.cons)):
             if i == 0:
                 if features is None:
