@@ -1,0 +1,31 @@
+{
+  "os": "Linux-5.15.0-124-generic-x86_64-with-glibc2.29",
+  "python": "CPython 3.8.10",
+  "startedAt": "2025-04-14T17:35:27.360638Z",
+  "program": "multiple_runs.py",
+  "codePath": "Logistic_Regression/multiple_runs.py",
+  "git": {
+    "remote": "https://github.com/JustinMuecke/GLaMoR_Model_Training.git",
+    "commit": "341d85fd6f325c3670b9bb00f64d113e2c34e017"
+  },
+  "email": "justin.muecke@gmail.com",
+  "root": "/media/nvme7n1/jmuecke/GLaMoR_Model_Training/Logistic_Regression",
+  "host": "servera",
+  "executable": "/media/nvme7n1/jmuecke/venv/bin/python3",
+  "codePathLocal": "multiple_runs.py",
+  "cpu_count": 16,
+  "cpu_count_logical": 32,
+  "disk": {
+    "/": {
+      "total": "840624627712",
+      "used": "222956003328"
+    }
+  },
+  "memory": {
+    "total": "2151703015424"
+  },
+  "cpu": {
+    "count": 16,
+    "countLogical": 32
+  }
+}

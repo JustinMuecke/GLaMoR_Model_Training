@@ -1,0 +1,1 @@
+{"test/precision":0.5606299212598426,"_runtime":1.053841713,"test/accuracy":0.5733761026463512,"test/recall":0.5845648604269293,"time/inference":"0:00:00.000756","_step":0,"_wandb":{"runtime":1},"time/training":"0:00:00.454146","_timestamp":1.744652782383432e+09}
