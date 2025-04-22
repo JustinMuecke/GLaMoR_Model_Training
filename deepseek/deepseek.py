@@ -9,7 +9,9 @@ torch.manual_seed(42)
 import wandb
 
 
-token = os.getenv("HF_token")
+
+token = os.getenv("HF_Token")
+
 
 
 def load_data():
