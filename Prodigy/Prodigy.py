@@ -765,7 +765,7 @@ def test(model, x, y, edge_index, prompt_mask, query_mask, prompts, numberQ, tas
         print(f"Accuracy: {accuracy.item()}")
         print(f"Precision: {precision.item()}")
         print(f"Recall: {recall.item()}")
-    return accuracy.item(), precision.item(), recall.item()
+    return accuracy.item(), precision.item(), recall.item(), predicted
 
 
 # Prodigy

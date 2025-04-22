@@ -174,3 +174,5 @@ data/**
 *.pkl
 /wandb*
 *.csv
+*/wandb/*
+Prodigy/models/

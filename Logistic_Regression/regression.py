@@ -6,6 +6,8 @@ from sklearn.linear_model import LogisticRegression
 from typing import Dict, Tuple
 from sklearn.metrics import make_scorer, accuracy_score, precision_score, recall_score
 import pickle
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 
 def _perform_grid_search(parameters : Dict[str, Dict], x_train :pd.DataFrame, y_train : pd.DataFrame, scoring : str = "accuracy") -> Tuple[object, str]:    
     '''
@@ -74,13 +76,22 @@ if __name__ == "__main__":
     train_data = train_data.dropna(subset=[f"feature_{i}" for i in range(100)])
     train_data.drop(train_data.tail(int(len(train_data)*0.15)).index, inplace=True)
     parameter_grid : Dict[str, Dict] = {
-                        "logistic_regression": {
-                            "model": LogisticRegression(), 
+                        #"logistic_regression": {
+                        #    "model": LogisticRegression(), 
+                        #    "parameters": {
+                        #        'penalty':['l1','l2'], 
+                        #        'C' : np.logspace(-4,4,20), 
+                        #        'solver': ['lbfgs', 'liblinear'],
+                        #        'max_iter'  : [50, 100,1000,2500]
+                        #    }
+                        #}
+                        "random_forest" : {
+                            "model": RandomForestClassifier(), 
                             "parameters": {
-                                'penalty':['l1','l2'], 
-                                'C' : np.logspace(-4,4,20), 
-                                'solver': ['lbfgs', 'liblinear'],
-                                'max_iter'  : [50, 100,1000,2500]
+                                'n_estimators': [25, 50, 100, 150], 
+                                "max_features": ['sqrt', 'log2', None], 
+                                'max_depth': [None, 3, 6, 9, 12], 
+                                'max_leaf_nodes': [5, 10, 20]
                             }
                         }
                     }
